@@ -9,7 +9,8 @@
 
 #define SYS_CLK 120000000
 
-#define SYSTEM_STANDBY_TIME_INIT 120
+#define SYSTEM_STANDBY_TIME_INIT 30
+#define SYSTEM_RESET_TIME_INIT 600
 
 typedef struct{
     uint8_t ui100MilliSecond;
@@ -23,9 +24,12 @@ typedef struct{
 }tsSystemTimeStruct;
 
 tsSystemTimeStruct tsSystemTime;
+
 uint16_t uiSystemStandbyCounterSeconds;
+uint16_t uiSystemResetCounterSeconds;
 
 uint16_t uiSystemStandbyTimeSeconds;
+uint16_t uiSystemResetTimeSeconds;
 
 uint32_t clock;
 

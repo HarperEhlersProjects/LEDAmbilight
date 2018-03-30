@@ -15,9 +15,12 @@
 #define UI_SLA_OFFSET 0 //for en/disable all SLA
 #define UI_SLA_ALL_ENABLE 0
 
-#define UI_MODE_MAX_VALUE UI_MODE_AMOUNT
+#define UI_MODE_MAX_VALUE (UI_MODE_AMOUNT-1)
 #define UI_MODIFIER_MAX_VALUE (UI_MODE_MAX_VALUE+UI_MODIFIER_AMOUNT)
 #define UI_PRESET_MAX_VALUE (UI_MODIFIER_MAX_VALUE+UI_PRESET_AMOUNT)
+
+#define UI_MODIFIER_INDEX (uiUIMode-UI_MODE_MAX_VALUE)
+#define UI_PRESET_INDEX (uiUIMode-UI_MODIFIER_MAX_VALUE)
 
 #define UI_MODIFIER_UNCHANGED 0x2
 #define UI_MODIFIER_ACTIVATED 0x1
@@ -29,7 +32,11 @@
 #define UI_STATE_PARAMETER_SELECTION 0x3
 #define UI_STATE_PARAMETER_SELECTED 0x4
 
-#define UI_MODE_NO_SELECTION 300
+#define UI_STATE_TYPE_MODE 0x0
+#define UI_STATE_TYPE_MODIFIER 0x1
+#define UI_STATE_TYPE_PRESET 0x2
+
+#define UI_MODE_NO_SELECTION 255
 
 uint8_t uiUIState;
 
@@ -39,14 +46,28 @@ uint8_t uiUIParameter;
 uint8_t uiUIParameterValue;
 
 uint8_t uiUISLAActive[SETTINGS_SLA_AMOUNT+UI_SLA_OFFSET];
-uint16_t uiUIModeActive;
-uint8_t uiUIModifierSelection[UI_MODIFIER_AMOUNT];
+uint8_t uiUIModeActive[SETTINGS_MODIFIER_AMOUNT+1];
 
-uint8_t uiPreviousState;
+uint8_t uiUIStandbyPreviousState;
 
 
 void vUIInit(void);
+void vUIReset(void);
+void vUIStandby(void);
+void vUIWakeUp(void);
 
 void vUIUpdate(void);
+
+uint8_t uiUIModeTypeGet(void);
+void vUIParameterSet(void);
+void vUISLASelectionSwitch(void);
+void vUIModeParameterStandardSet(void);
+void vUIModifierParameterStandardSet(void);
+void vUIModifierSelectionSwitch(void);
+void vUIModifierActivate(void);
+void vUIModifierDeactivate(void);
+void vUIPresetLoad(void);
+uint8_t uiUIParameterValueGet(void);
+void uiUIParameterValueSet(void);
 
 #endif /* UI_STATEMACHINE_H_ */

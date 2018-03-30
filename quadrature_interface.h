@@ -31,7 +31,7 @@
 /*
  * QEI Counter offset for boundarys
  */
-#define QEI_COUNTER_OFFSET 50
+#define QEI_COUNTER_OFFSET 24
 
 /*
  * QEI counter maximum position
@@ -51,5 +51,6 @@
 void vQEIInit(void);
 void QEIIncrementHandler(void);
 void vQEIPositionSet(uint16_t);
+uint16_t uiQEIPositionGet(uint16_t,uint16_t);
 
 #endif /* QUADRATURE_INTERFACE_H_ */

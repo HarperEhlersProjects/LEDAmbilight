@@ -31,6 +31,7 @@
 #define BUTTONS_PUSHED_INCREMENTER 0x1
 #define BUTTONS_PUSHED_RIGHT 0x2
 #define BUTTONS_PUSHED_LEFT 0x4
+#define BUTTONS_PUSHED_LEFTANDRIGHT 0x6
 
 void vButtonsInit(void);
 void vButtonsHandler(void);

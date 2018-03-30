@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <hw_memmap.h>
+#include "settings.h"
 
 /*
  * Use GPIO Port K as led controller interface output port.
@@ -16,7 +17,7 @@
  * Use all pins for the output port.
  * change here for the use of other pins.
  */
-#define LED_CONTROLLER_INTERFACE_OUTPUT_PINS 0x1
+#define LED_CONTROLLER_INTERFACE_OUTPUT_PINS 0x3
 
 /*
  * Use Timer 1 for timing the Bits of the NZR Protocol
@@ -49,8 +50,8 @@
 #define TIMER_INTERVAL_0us5 (SYS_CLK/10000000)*5
 #define TIMER_INTERVAL_1us2 (SYS_CLK/10000000)*12
 
-#define TIMER_INTERVAL_0_OFFSET 140
-#define TIMER_INTERVAL_1_OFFSET 160
+#define TIMER_INTERVAL_0_OFFSET 130
+#define TIMER_INTERVAL_1_OFFSET 195
 
 #define BIT_SEQUENCE_LENGTH 24
 
@@ -60,14 +61,16 @@
 #define LED_CONTROLLER_INTERFACE_STATE_TRANSMISSION 0x1
 #define LED_CONTROLLER_INTERFACE_STATE_RESET 0x2
 
-uint8_t uiLEDCIBitField[60][BIT_SEQUENCE_LENGTH];
+uint8_t uiLEDCIBitField[SETTINGS_SLA_LENGTH_MAX][BIT_SEQUENCE_LENGTH];
 uint8_t uiLEDCITransmissionRun;
-uint8_t uiLEDCIOutputMask;
+
 
 void vLEDControllerInterfaceInit(void);
 void vLEDControllerInterfaceTimerSynchro(void);
 
 void vLEDControllerInterfaceOutputSet(uint8_t uiOutputBitfield);
+
+void vLEDControllerInterfaceOutputMaskSet(void);
 
 void LEDControllerInterfaceBitHandler(void);
 void LEDControllerInterfaceHL0Handler(void);

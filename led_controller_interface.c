@@ -10,6 +10,9 @@
 
 uint8_t uiLEDCIState=LED_CONTROLLER_INTERFACE_STATE_RESET;
 
+uint8_t uiLEDCIOutputMask;
+uint8_t uiLEDCIOutputMaskInit;
+
 uint16_t uiLEDCIBitSequenceCounter=0;
 uint16_t uiLEDCIDataPackageCounter=0;
 
@@ -58,6 +61,9 @@ void vLEDControllerInterfaceInit(void)
     TimerDisable(LED_CONTROLLER_INTERFACE_TIMER_BIT, TIMER_A);
     TIMER1_CTL_R|=0x001;
 
+    //calculate initial Outputmask for every transmit
+    uiLEDCIOutputMaskInit = SETTINGS_SLA0_ENABLE | (SETTINGS_SLA1_ENABLE<<1) | (SETTINGS_SLA2_ENABLE<<2) | (SETTINGS_SLA3_ENABLE<<3) | (SETTINGS_SLA4_ENABLE<<4) | (SETTINGS_SLA5_ENABLE<<5) | (SETTINGS_SLA6_ENABLE<<6) | (SETTINGS_SLA7_ENABLE<<7);
+
     uiLEDCITransmissionRun=0;
 }
 
@@ -82,6 +88,8 @@ void LEDControllerInterfaceBitHandler(void)
                     //vLEDControllerInterfaceOutputSet(0xFF & uiLEDCIOutputMask);
                     uiLEDCIState=LED_CONTROLLER_INTERFACE_STATE_TRANSMISSION;
                     uiLEDCIBitSequenceCounter=0;
+                    //Reset Outputmask
+                    uiLEDCIOutputMask=uiLEDCIOutputMaskInit;
                 }
             }
 
@@ -100,9 +108,10 @@ void LEDControllerInterfaceBitHandler(void)
             }
             else
             {
-                if(uiLEDCIDataPackageCounter < 60)
+                uiLEDCIDataPackageCounter++;
+                if(uiLEDCIDataPackageCounter < SETTINGS_SLA_LENGTH_MAX)
                 {
-                    uiLEDCIDataPackageCounter++;
+                    vLEDControllerInterfaceOutputMaskSet();
                 }
                 else
                 {
@@ -121,4 +130,17 @@ void LEDControllerInterfaceBitHandler(void)
 void inline vLEDControllerInterfaceOutputSet(uint8_t uiOutputBitfield)
 {
     GPIOPinWrite(LED_CONTROLLER_INTERFACE_OUTPUT_PORT,LED_CONTROLLER_INTERFACE_OUTPUT_PINS,uiOutputBitfield);      //write on pins defined in LED_CONTROLLER_INTERFACE_OUTPUT_PINS
+}
+
+void inline vLEDControllerInterfaceOutputMaskSet(void)
+{
+    uint8_t uiCounter;
+
+    for(uiCounter=0;uiCounter<SETTINGS_SLA_AMOUNT;uiCounter++)
+    {
+        if(uiLEDCIDataPackageCounter >= tsSettings[uiCounter].uiSLALength)
+        {
+                uiLEDCIOutputMask &= ~(0x1<<uiCounter);
+        }
+    }
 }

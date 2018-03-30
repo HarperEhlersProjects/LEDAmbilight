@@ -17,6 +17,7 @@ void vSystemSetUp(void)
     tsSystemTime.uiYear=0;
 
     uiSystemStandbyTimeSeconds=SYSTEM_STANDBY_TIME_INIT;
+    uiSystemResetTimeSeconds=SYSTEM_RESET_TIME_INIT;
 
     SysTickPeriodSet(SYS_CLK/10); //interrupt every 100ms
 
@@ -41,30 +42,24 @@ void vSystemSysTickHandler(void)
         tsSystemTime.uiSecond++;
 
         //----------------GENERATING STANDBY TIMER---------------------------------------
-        if(uiSystemStandbyCounterSeconds>0)
+        if(uiSystemStandbyCounterSeconds>1)
         {
             uiSystemStandbyCounterSeconds--;
         }
-        else
+        else if(uiSystemStandbyCounterSeconds==1)
         {
-            uiUIState=UI_STATE_STANDBY;
+            vUIStandby();
+            uiSystemStandbyCounterSeconds--;
+        }
 
-            uiUISLA=0;
-            uiUIMode=0;
-            uiUIModeActive=UI_MODE_NO_SELECTION;
-            uiUIParameter=0;
-
-            for(uiSystemCounter=0;uiSystemCounter<SETTINGS_SLA_AMOUNT;uiSystemCounter++)
-            {
-                uiUISLAActive[uiSystemCounter]=0x0;
-            }
-
-            for(uiSystemCounter=0;uiSystemCounter<UI_MODIFIER_MAX_VALUE-UI_MODE_MAX_VALUE;uiSystemCounter++)
-            {
-                uiUIModifierSelection[uiSystemCounter]=0x2;
-            }
-
-            vUIUpdate();
+        if(uiSystemResetCounterSeconds>1)
+        {
+            uiSystemResetCounterSeconds--;
+        }
+        else if(uiSystemResetCounterSeconds==1)
+        {
+            vUIReset();
+            uiSystemResetCounterSeconds--;
         }
         //----------------GENERATING STANDBY TIMER---------------------------------------
 

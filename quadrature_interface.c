@@ -77,118 +77,21 @@ void QEIIncrementHandler(void)
 
     switch(uiUIState)
     {
-        case UI_STATE_STANDBY:
-                              if(uiQEIPositionPrevious != uiQEIPosition)
-                              {
-                                  uiUIState=UI_STATE_SLA_SELECTION;
-                                  uiSystemStandbyTimeSeconds=SYSTEM_STANDBY_TIME_INIT;
-                                  QEIPositionSet(QEI_MODULE,QEI_COUNTER_OFFSET);
-                              }
+        case UI_STATE_SLA_SELECTION: uiUISLA = uiQEIPositionGet(0,SETTINGS_SLA_AMOUNT);
         break;
-        case UI_STATE_SLA_SELECTION:
-                              if(uiQEIPosition < QEI_COUNTER_OFFSET)
-                              {
-                                  QEIPositionSet(QEI_MODULE,QEI_COUNTER_OFFSET);
-                                  uiUISLA=0;
-                              }
-                              else if(uiQEIPosition > (SETTINGS_SLA_AMOUNT*2)+1+QEI_COUNTER_OFFSET)
-                              {
-                                  QEIPositionSet(QEI_MODULE,18+QEI_COUNTER_OFFSET);
-                                  uiUISLA=SETTINGS_SLA_AMOUNT;
-                              }
-                              else
-                              {
-                                  uiUISLA=((uiQEIPosition-QEI_COUNTER_OFFSET)>>1);
-                              }
-
+        case UI_STATE_MODE_SELECTION: uiUIMode = uiQEIPositionGet(0,UI_PRESET_MAX_VALUE);
         break;
-        case UI_STATE_MODE_SELECTION:
-                              if(uiQEIPosition < QEI_COUNTER_OFFSET)
-                              {
-                                  QEIPositionSet(QEI_MODULE,QEI_COUNTER_OFFSET);
-                                  uiUIMode=0;
-                              }
-                              else if(uiQEIPosition > (UI_PRESET_MAX_VALUE*2)+1+QEI_COUNTER_OFFSET)
-                              {
-                                  QEIPositionSet(QEI_MODULE,(UI_PRESET_MAX_VALUE*2)+QEI_COUNTER_OFFSET);
-                                  uiUIMode=UI_PRESET_MAX_VALUE;
-                              }
-                              else
-                              {
-                                  uiUIMode=((uiQEIPosition-QEI_COUNTER_OFFSET)>>1);
-                              }
+        case UI_STATE_PARAMETER_SELECTION:  uiUIParameter = uiQEIPositionGet(0,SETTINGS_PARAMETER_AMOUNT);
+                                            uiUIParameterValue = uiUIParameterValueGet();
         break;
-        case UI_STATE_PARAMETER_SELECTION:
-                              if(uiQEIPosition < QEI_COUNTER_OFFSET)
-                              {
-                                  QEIPositionSet(QEI_MODULE,QEI_COUNTER_OFFSET);
-                                  uiUIParameter=0;
-                              }
-                              else if(uiQEIPosition > (SETTINGS_PARAMETER_AMOUNT*2)+1+QEI_COUNTER_OFFSET)
-                              {
-                                  QEIPositionSet(QEI_MODULE,(SETTINGS_PARAMETER_AMOUNT*2)+QEI_COUNTER_OFFSET);
-                                  uiUIParameter=SETTINGS_PARAMETER_AMOUNT;
-                              }
-                              else
-                              {
-                                  uiUIParameter=((uiQEIPosition-QEI_COUNTER_OFFSET)>>1);
-                              }
-
-                              uiQEIDataFound=0;
-                              uiQEICounter=0;
-                              while(!uiQEIDataFound && uiQEICounter<SETTINGS_SLA_AMOUNT)
-                              {
-                                  if(uiUISLAActive[uiQEICounter])
-                                  {
-                                      uiUIParameterValue=tsSettings[uiQEICounter].uiParameterValue[uiUIParameter];
-                                      uiQEIDataFound=1;
-                                  }
-                                  uiQEICounter++;
-                              }
-        break;
-
-        case UI_STATE_PARAMETER_SELECTED:
-                              if(uiQEIPosition < QEI_COUNTER_OFFSET)
-                              {
-                                  QEIPositionSet(QEI_MODULE,QEI_COUNTER_OFFSET);
-                                  uiUIParameterValue=0;
-                              }
-                              else if(uiQEIPosition > 511+QEI_COUNTER_OFFSET)
-                              {
-                                  QEIPositionSet(QEI_MODULE,510+QEI_COUNTER_OFFSET);
-                                  uiUIParameterValue=255;
-                              }
-                              else
-                              {
-                                  uiUIParameterValue=((uiQEIPosition-QEI_COUNTER_OFFSET)>>1);
-                              }
-
-                              for(uiQEICounter=0;uiQEICounter<SETTINGS_SLA_AMOUNT;uiQEICounter++)
-                              {
-                                  if(uiUISLAActive[uiQEICounter])
-                                  {
-                                      tsSettings[uiQEICounter].uiParameterValue[uiUIParameter]=uiUIParameterValue;
-                                  }
-                              }
-
+        case UI_STATE_PARAMETER_SELECTED:   uiUIParameterValue = uiQEIPositionGet(0,510);
+                                            uiUIParameterValueSet();
         break;
     }
 
-
-    /*
-if(uiUIMode<UI_MODE_MAX_VALUE && uiUIMode > UI_MODIFIER_MAX_VALUE)
-{
-    uiUIParameterValue=
-}
-else
-{
-
-}
-*/
-
 if(uiQEIPositionPrevious != uiQEIPosition)
 {
-    uiSystemStandbyCounterSeconds=uiSystemStandbyTimeSeconds;
+    vUIWakeUp();
 }
 
 uiQEIPositionPrevious = uiQEIPosition;
@@ -198,4 +101,23 @@ vUIUpdate(); //update UI after every QEI interaction
 void vQEIPositionSet(uint16_t uiValue)
 {
     QEIPositionSet(QEI_MODULE,(uiValue<<1)+QEI_COUNTER_OFFSET);
+}
+
+uint16_t uiQEIPositionGet(uint16_t uiBoundaryBottom, uint16_t uiBoundaryTop)
+{
+    if(uiQEIPosition < (QEI_COUNTER_OFFSET + uiBoundaryBottom))
+    {
+        QEIPositionSet(QEI_MODULE,QEI_COUNTER_OFFSET + (uiBoundaryBottom << 1));
+        return uiBoundaryBottom;
+    }
+    else if(uiQEIPosition > (uiBoundaryTop << 1) + 1 + QEI_COUNTER_OFFSET)
+    {
+        QEIPositionSet(QEI_MODULE,(uiBoundaryTop << 1) + QEI_COUNTER_OFFSET);
+        return uiBoundaryTop;
+    }
+    else
+    {
+        return ((uiQEIPosition-QEI_COUNTER_OFFSET)>>1);
+    }
+
 }

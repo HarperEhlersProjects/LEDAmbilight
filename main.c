@@ -24,6 +24,7 @@ void main(void)
     vSystemSetUp();
     vSettingsInit();
     vDelayInit();
+    vGraphicsInit();
     vLEDControllerInterfaceInit();
     vQEIInit();
     vI2CInterfaceInit();
@@ -31,14 +32,11 @@ void main(void)
     vUIInit();
     IntMasterEnable();
 
-    uiLEDCIOutputMask=0x1;
-
     while(1)
     {
         //vDelaySec(1);
-        vGraphicsModeCalc();
-        vGraphicsTransmissionInitiate();
-
+        //vGraphicsModeCalc();
+        //vGraphicsTransmissionInitiate();
     }
 }
 
