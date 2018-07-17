@@ -47,12 +47,9 @@ void vButtonsInit()
 void vButtonsHandler(void)
 {
 
-//vDelayMiliSec(200);
+vDelayMiliSec(30);
 
 uiButtonsPushed=GPIOPinRead(BUTTONS_GPIO_PORT,BUTTONS_PINS);
-
-GPIOIntClear(BUTTONS_GPIO_PORT,BUTTONS_PINS);
-
 
 
 switch(uiButtonsPushed)
@@ -92,9 +89,19 @@ case BUTTONS_PUSHED_INCREMENTER://INCREMENTER IS PUSHED
         break;
         case UI_STATE_PARAMETER_SELECTED: uiUIState=UI_STATE_PARAMETER_SELECTION;
                                           //Set Parameter depending on which mode is selected
-                                          vUIParameterSet();
+                                          vUIParameterValueSet();
                                           //Set QEIposition for new state
                                           vQEIPositionSet(uiUIParameter);
+        break;
+        case UI_STATE_SETTINGS_SELECTION: uiUIState=UI_STATE_SETTINGS_SELECTED;
+                                          //Set QEI position for new state
+                                          vQEIPositionSet(uiUISettingValue);
+        break;
+        case UI_STATE_SETTINGS_SELECTED:  uiUIState=UI_STATE_SETTINGS_SELECTION;
+                                          //Set Parameter depending on which systemsetting is selected
+                                          vUISettingValueSet();
+                                          //Set QEIposition for new state
+                                          vQEIPositionSet(uiUISetting);
         break;
     }
 break;
@@ -130,14 +137,29 @@ case BUTTONS_PUSHED_LEFT://LEFT BUTTON PUSHED
                                           uiUIState=UI_STATE_SLA_SELECTION;
                                           vQEIPositionSet(uiUISLA);
         break;
-        case UI_STATE_PARAMETER_SELECTION: uiUIState=UI_STATE_MODE_SELECTION;
-                                           vQEIPositionSet(uiUIMode);
+        case UI_STATE_PARAMETER_SELECTION:
+                                            uiUIState=UI_STATE_MODE_SELECTION;
+                                            vQEIPositionSet(uiUIMode);
         break;
     }
 break;
-case BUTTONS_PUSHED_LEFTANDRIGHT:   vUIStandby();
+case BUTTONS_PUSHED_LEFTANDRIGHT:
+    switch(uiUIState)
+    {
+        case UI_STATE_SLA_SELECTION:
+                                    uiUIState = UI_STATE_SETTINGS_SELECTION;
+                                    uiUISetting=0;
+                                    vQEIPositionSet(uiUISetting);
+        break;
+        case UI_STATE_SETTINGS_SELECTION:
+                                    uiUIState=UI_STATE_SLA_SELECTION;
+                                    vQEIPositionSet(uiUISLA);
+        break;
+    }
 break;
 }
+
+GPIOIntClear(BUTTONS_GPIO_PORT,BUTTONS_PINS);
 
 vUIWakeUp();
 

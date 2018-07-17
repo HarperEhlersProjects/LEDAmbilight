@@ -147,7 +147,7 @@ void vGraphicsMode0(uint8_t uiSLA)
 
 void vGraphicsMode1(uint8_t uiSLA)
 {
-    tsColorStruct tsColor={tsSettings[uiSLA].uiModeParameter[0][0],tsSettings[uiSLA].uiModeParameter[0][1],tsSettings[uiSLA].uiModeParameter[0][2]};
+    tsColorStruct tsColor={tsSettings[uiSLA].uiModeParameter[0][0]*tsSettings[uiSLA].uiModeParameter[0][3],tsSettings[uiSLA].uiModeParameter[0][1]*tsSettings[uiSLA].uiModeParameter[0][3],tsSettings[uiSLA].uiModeParameter[0][2]*tsSettings[uiSLA].uiModeParameter[0][3]};
     uint8_t uiCounter;
 
     for(uiCounter=0;uiCounter<tsSettings[uiSLA].uiSLALength;uiCounter++)
@@ -158,17 +158,17 @@ void vGraphicsMode1(uint8_t uiSLA)
 
 void vGraphicsMode2(uint8_t uiSLA)
 {
-    tsColorStruct tsColor={tsSettings[uiSLA].uiModeParameter[0][0],tsSettings[uiSLA].uiModeParameter[0][1],tsSettings[uiSLA].uiModeParameter[0][2]};
+    tsColorStruct tsColor={tsSettings[uiSLA].uiModeParameter[0][0]*tsSettings[uiSLA].uiModeParameter[0][3],tsSettings[uiSLA].uiModeParameter[0][1]*tsSettings[uiSLA].uiModeParameter[0][3],tsSettings[uiSLA].uiModeParameter[0][2]*tsSettings[uiSLA].uiModeParameter[0][3]};
     uint8_t uiCounter;
     uint16_t uiTopBoundary,uiBottomBoundary;
 
     tsSettings[uiSLA].uiModeActors[1]++;
 
-    if(tsSettings[uiSLA].uiModeActors[1]>255-tsSettings[uiSLA].uiModeParameter[0][4])
+    if(tsSettings[uiSLA].uiModeActors[1]>255-tsSettings[uiSLA].uiModeParameter[0][5])
     {
         tsSettings[uiSLA].uiModeActors[0]++;
 
-        if(tsSettings[uiSLA].uiModeActors[0]>=tsSettings[uiSLA].uiSLALength+tsSettings[uiSLA].uiModeParameter[0][3])
+        if(tsSettings[uiSLA].uiModeActors[0]>=tsSettings[uiSLA].uiSLALength+tsSettings[uiSLA].uiModeParameter[0][4])
         {
             tsSettings[uiSLA].uiModeActors[0]=0;
         }
@@ -176,13 +176,13 @@ void vGraphicsMode2(uint8_t uiSLA)
         tsSettings[uiSLA].uiModeActors[1]=0;
     }
 
-    if(tsSettings[uiSLA].uiModeActors[0] - tsSettings[uiSLA].uiModeParameter[0][3] < 0)  //cut if its too long for SLA
+    if(tsSettings[uiSLA].uiModeActors[0] - tsSettings[uiSLA].uiModeParameter[0][4] < 0)  //cut if its too long for SLA
     {
         uiBottomBoundary=0;
     }
     else
     {
-        uiBottomBoundary=tsSettings[uiSLA].uiModeActors[0] - tsSettings[uiSLA].uiModeParameter[0][3];
+        uiBottomBoundary=tsSettings[uiSLA].uiModeActors[0] - tsSettings[uiSLA].uiModeParameter[0][4];
     }
 
     uiTopBoundary=tsSettings[uiSLA].uiModeActors[0];

@@ -8,6 +8,7 @@
 #define SETTINGS_MODIFIER_AMOUNT 1
 #define SETTINGS_PRESET_AMOUNT 10
 #define SETTINGS_PARAMETER_AMOUNT 6
+#define SETTINGS_SYSTEMSETTINGS_AMOUNT 12
 
 #define SETTINGS_SLA_INDEX_MAX (SETTINGS_SLA_AMOUNT - 1)
 #define SETTINGS_MODE_INDEX_MAX (SETTINGS_MODE_AMOUNT - 1)
@@ -41,7 +42,7 @@ uint16_t uiSLALength;
 uint8_t uiModeParameter[1+SETTINGS_MODIFIER_AMOUNT][SETTINGS_PARAMETER_AMOUNT];
 uint8_t uiModeActive[1+SETTINGS_MODIFIER_AMOUNT];
 
-//variables for things like SLA individual time behavior
+//variables for for example SLA individual time behavior
 uint16_t uiModeActors[2];
 }tsSettingsStruct;
 

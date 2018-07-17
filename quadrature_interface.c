@@ -11,6 +11,16 @@
 #include "ui_statemachine.h"
 #include "settings.h"
 
+//[Mode] = {Boundarybot,Boundarytop}
+uint16_t uiQEIModeParameterBoundaryLUT[SETTINGS_MODE_AMOUNT + SETTINGS_MODIFIER_AMOUNT][2] = {{0,0},{0,3},{0,5},{0,10}};
+//[Mode][Parameter][BOT or TOP Boundary]: {{PARAMETERBOUNDARYBOT,PARAMETERBOUNDARYTOP},{...,...},...}
+uint16_t uiQEIModeParameterValueBoundaryLUT[SETTINGS_MODE_AMOUNT][SETTINGS_PARAMETER_AMOUNT][2] = {{{0,0},{0,0},{0,0},{0,0},{0,0}},
+                                                                                                   {{0,9},{0,9},{0,9},{0,28},{0,0},{0,0}},
+                                                                                                   {{0,9},{0,9},{0,9},{0,28},{0,60},{240,255}}
+                                                                                                   };
+
+uint16_t uiQEISettingsParameterValueBoundaryLUT[SETTINGS_SYSTEMSETTINGS_AMOUNT][2] = {{0,300},{0,300},{0,300},{0,300},{0,300},{0,300},{0,300},{0,300},{0,23},{0,59},{0,59},{0,9}};
+
 uint16_t uiQEIPosition;
 uint16_t uiQEIPositionPrevious;
 
@@ -77,15 +87,21 @@ void QEIIncrementHandler(void)
 
     switch(uiUIState)
     {
-        case UI_STATE_SLA_SELECTION: uiUISLA = uiQEIPositionGet(0,SETTINGS_SLA_AMOUNT);
+        case UI_STATE_SLA_SELECTION: uiUISLA = uiQEIPositionGet(0,SETTINGS_SLA_AMOUNT-1);
         break;
         case UI_STATE_MODE_SELECTION: uiUIMode = uiQEIPositionGet(0,UI_PRESET_MAX_VALUE);
         break;
-        case UI_STATE_PARAMETER_SELECTION:  uiUIParameter = uiQEIPositionGet(0,SETTINGS_PARAMETER_AMOUNT);
-                                            uiUIParameterValue = uiUIParameterValueGet();
+        case UI_STATE_PARAMETER_SELECTION: uiUIParameter = uiQEIPositionGet(uiQEIModeParameterBoundaryLUT[uiUIMode][0],uiQEIModeParameterBoundaryLUT[uiUIMode][1]);
+                                           uiUIParameterValue = uiUIParameterValueGet();
         break;
-        case UI_STATE_PARAMETER_SELECTED:   uiUIParameterValue = uiQEIPositionGet(0,510);
-                                            uiUIParameterValueSet();
+        case UI_STATE_PARAMETER_SELECTED:  uiUIParameterValue = uiQEIPositionGet(uiQEIModeParameterValueBoundaryLUT[uiUIMode][uiUIParameter][0],uiQEIModeParameterValueBoundaryLUT[uiUIMode][uiUIParameter][1]);
+                                           vUIParameterValueSet();
+        break;
+        case UI_STATE_SETTINGS_SELECTION:  uiUISetting = uiQEIPositionGet(0,SETTINGS_SYSTEMSETTINGS_AMOUNT-1);
+                                           uiUISettingValue = uiUISettingValueGet();
+        break;
+        case UI_STATE_SETTINGS_SELECTED:   uiUISettingValue = uiQEIPositionGet(uiQEISettingsParameterValueBoundaryLUT[uiUISetting][0],uiQEISettingsParameterValueBoundaryLUT[uiUISetting][1]);
+                                           vUISettingValueSet();
         break;
     }
 

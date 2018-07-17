@@ -35,7 +35,7 @@
 /*
  * PORTEXPANDER MAKROS
  */
-#define PORTEXPANDER_ADRESS_BASE1 0x24      //0x20 is general base address of port expander
+#define PORTEXPANDER_ADRESS_BASE1 0x20      //0x20 is general base address of port expander
 #define PORTEXPANDER_ADRESS_BASE2 0x21
 #define PORTEXPANDER_ADRESS_BASE3 0x22
 

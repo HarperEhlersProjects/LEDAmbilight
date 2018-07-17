@@ -3,6 +3,19 @@
 #include "i2c_interface.h"
 #include "system_set_up.h"
 
+//combine these makros for setting up ui leds
+#define UI_LED_BLANK 0x0
+#define UI_MODELED_1 0x8
+#define UI_MODELED_2 0x10
+#define UI_MODELED_3 0x20
+#define UI_RGBLED_RED 0x1
+#define UI_RGBLED_GREEN 0x4
+#define UI_RGBLED_BLUE 0x2
+#define UI_RGBLED_ORANGE (UI_RGBLED_RED | UI_RGBLED_GREEN)
+#define UI_RGBLED_PURPLE (UI_RGBLED_RED | UI_RGBLED_BLUE)
+#define UI_RGBLED_TURKIS (UI_RGBLED_GREEN | UI_RGBLED_BLUE)
+#define UI_RGBLED_WHITE (UI_RGBLED_RED | UI_RGBLED_GREEN | UI_RGBLED_BLUE)
+
 uint8_t uiSevenSegmentLUT[UI_SYMBOLS_NUMBER] = {0x01,0x37,0x42,0x12,0x34,0x18,0x08,0x33,0x0,0x10,0x7F};
 
 uint8_t uiUIDisplay00;
@@ -63,11 +76,11 @@ void vUIUpdate(void)
 
                                     if(uiUISLAActive[uiUISLA])
                                     {
-                                        uiUILED=0x0A;
+                                        uiUILED=UI_RGBLED_GREEN | UI_MODELED_1;
                                     }
                                     else
                                     {
-                                        uiUILED=0x09;
+                                        uiUILED=UI_RGBLED_RED | UI_MODELED_1;
                                     }
         break;
         case UI_STATE_MODE_SELECTION:
@@ -91,12 +104,12 @@ void vUIUpdate(void)
                                     {
                                         if(uiUIMode==uiUIModeActive[0])
                                         {
-                                            uiUILED=0x15;
+                                            uiUILED=UI_RGBLED_PURPLE | UI_MODELED_2;
 
                                         }
                                         else
                                         {
-                                            uiUILED=0x10;
+                                            uiUILED=UI_MODELED_2;
 
                                         }
                                     }
@@ -104,20 +117,20 @@ void vUIUpdate(void)
                                     {
                                         if(uiUIModeActive[UI_MODIFIER_INDEX]==0x2)
                                         {
-                                            uiUILED=0x14;
+                                            uiUILED=UI_RGBLED_BLUE | UI_MODELED_2;
                                         }
                                         else if(uiUIModeActive[UI_MODIFIER_INDEX]==0x0)
                                         {
-                                            uiUILED=0x11;
+                                            uiUILED=UI_RGBLED_RED | UI_MODELED_2;
                                         }
                                         else
                                         {
-                                            uiUILED=0x12;
+                                            uiUILED=UI_RGBLED_GREEN | UI_MODELED_2;
                                         }
                                     }
                                     else
                                     {
-                                        uiUILED=0x17;
+                                        uiUILED=UI_RGBLED_WHITE | UI_MODELED_2;
                                     }
         break;
         case UI_STATE_PARAMETER_SELECTION:
@@ -143,7 +156,7 @@ void vUIUpdate(void)
                                         uiUIDisplay12=uiUIParameterValue/100;
                                     }
 
-                                    uiUILED=0x20;
+                                    uiUILED=UI_MODELED_3;
         break;
         case UI_STATE_PARAMETER_SELECTED:
                                     uiUIDisplay00=uiUIParameter;
@@ -168,18 +181,84 @@ void vUIUpdate(void)
                                         uiUIDisplay12=uiUIParameterValue/100;
                                     }
 
-                                    uiUILED=0x24;
+                                    uiUILED=UI_RGBLED_ORANGE | UI_MODELED_3;
+        break;
+        case UI_STATE_SETTINGS_SELECTION:
+                                    if(uiUISetting<10)
+                                    {
+                                        uiUIDisplay00=uiUISetting;
+                                        uiUIDisplay01=UI_SYMBOLS_BLANK;
+                                    }
+                                    else
+                                    {
+                                        uiUIDisplay00=uiUISetting%10;
+                                        uiUIDisplay01=(int) (uiUISetting/10);
+                                    }
+
+                                    if(uiUISettingValue<10)
+                                    {
+                                        uiUIDisplay10=uiUISettingValue;
+                                        uiUIDisplay11=UI_SYMBOLS_BLANK;
+                                        uiUIDisplay12=UI_SYMBOLS_BLANK;
+                                    }
+                                    else if(uiUISettingValue<100)
+                                    {
+                                        uiUIDisplay10=uiUISettingValue%10;
+                                        uiUIDisplay11=uiUISettingValue/10;
+                                        uiUIDisplay12=UI_SYMBOLS_BLANK;
+                                    }
+                                    else
+                                    {
+                                        uiUIDisplay10=uiUISettingValue%10;
+                                        uiUIDisplay11=(uiUISettingValue/10)%10;
+                                        uiUIDisplay12=uiUISettingValue/100;
+                                    }
+
+                                    uiUILED=UI_MODELED_1 | UI_MODELED_2 | UI_MODELED_3;
+        break;
+        case UI_STATE_SETTINGS_SELECTED:
+                                    if(uiUISetting<10)
+                                    {
+                                        uiUIDisplay00=uiUISetting;
+                                        uiUIDisplay01=UI_SYMBOLS_BLANK;
+                                    }
+                                    else
+                                    {
+                                        uiUIDisplay00=uiUISetting%10;
+                                        uiUIDisplay01=(int) (uiUISetting/10);
+                                    }
+
+                                    if(uiUISettingValue<10)
+                                    {
+                                        uiUIDisplay10=uiUISettingValue;
+                                        uiUIDisplay11=UI_SYMBOLS_BLANK;
+                                        uiUIDisplay12=UI_SYMBOLS_BLANK;
+                                    }
+                                    else if(uiUISettingValue<100)
+                                    {
+                                        uiUIDisplay10=uiUISettingValue%10;
+                                        uiUIDisplay11=uiUISettingValue/10;
+                                        uiUIDisplay12=UI_SYMBOLS_BLANK;
+                                    }
+                                    else
+                                    {
+                                        uiUIDisplay10=uiUISettingValue%10;
+                                        uiUIDisplay11=(uiUISettingValue/10)%10;
+                                        uiUIDisplay12=uiUISettingValue/100;
+                                    }
+
+                                    uiUILED=UI_RGBLED_WHITE | UI_MODELED_1 | UI_MODELED_2 | UI_MODELED_3;
         break;
     }
 
-    vI2CInterfaceOutputWrite(0,uiSevenSegmentLUT[uiUIDisplay01]);
-    vI2CInterfaceOutputWrite(1,uiSevenSegmentLUT[uiUIDisplay00]);
+    vI2CInterfaceOutputWrite(1,uiSevenSegmentLUT[uiUIDisplay01]);
+    vI2CInterfaceOutputWrite(0,uiSevenSegmentLUT[uiUIDisplay00]);
 
-    vI2CInterfaceOutputWrite(2,uiSevenSegmentLUT[uiUIDisplay12]);
-    vI2CInterfaceOutputWrite(3,uiSevenSegmentLUT[uiUIDisplay11]);
-    vI2CInterfaceOutputWrite(4,uiSevenSegmentLUT[uiUIDisplay10]);
+    vI2CInterfaceOutputWrite(3,uiSevenSegmentLUT[uiUIDisplay12]);
+    vI2CInterfaceOutputWrite(2,uiSevenSegmentLUT[uiUIDisplay11]);
+    vI2CInterfaceOutputWrite(5,uiSevenSegmentLUT[uiUIDisplay10]);
 
-    vI2CInterfaceOutputWrite(5,uiUILED);
+    vI2CInterfaceOutputWrite(4,uiUILED);
 }
 
 void vUIClear()
@@ -191,7 +270,7 @@ void vUIClear()
     vI2CInterfaceOutputWrite(3,uiSevenSegmentLUT[UI_SYMBOLS_BLANK]);
     vI2CInterfaceOutputWrite(4,uiSevenSegmentLUT[UI_SYMBOLS_BLANK]);
 
-    vI2CInterfaceOutputWrite(5,0x0);
+    vI2CInterfaceOutputWrite(5,UI_LED_BLANK);
 }
 
 void vUIStandby(void)
@@ -264,7 +343,7 @@ uint8_t uiUIModeTypeGet(void)
     }
 }
 
-
+/*
 void vUIParameterSet(void)
 {
     uint8_t uiCounterSLA;
@@ -289,8 +368,8 @@ void vUIParameterSet(void)
             }
         }
     }
-
 }
+*/
 
 void vUISLASelectionSwitch(void)
 {
@@ -402,58 +481,112 @@ void vUIPresetLoad(void)
 
 }
 
-uint8_t uiUIParameterValueGet(void)
+uint16_t uiUIParameterValueGet(void)
 {
     uint8_t uiCounterSLA=0;
 
-    if(uiUIModeTypeGet() == UI_STATE_TYPE_MODE)
-    {
-        while(uiCounterSLA<SETTINGS_SLA_AMOUNT)
+        if(uiUIModeTypeGet() == UI_STATE_TYPE_MODE)
         {
-            if(uiUISLAActive[uiCounterSLA])
+            while(uiCounterSLA<SETTINGS_SLA_AMOUNT)
             {
-                return tsSettings[uiCounterSLA].uiModeParameter[0][uiUIParameter];
+                if(uiUISLAActive[uiCounterSLA])
+                {
+                    return tsSettings[uiCounterSLA].uiModeParameter[0][uiUIParameter];
+                }
+                uiCounterSLA++;
             }
-            uiCounterSLA++;
         }
+        else if(uiUIModeTypeGet() == UI_STATE_TYPE_MODIFIER)
+        {
+            while(uiCounterSLA<SETTINGS_SLA_AMOUNT)
+            {
+                if(uiUISLAActive[uiCounterSLA])
+                {
+                    return tsSettings[uiCounterSLA].uiModeParameter[UI_MODIFIER_INDEX][uiUIParameter];
+                }
+                uiCounterSLA++;
+            }
+        }
+
+    return 0;
+}
+
+void vUIParameterValueSet(void)
+{
+    uint8_t uiCounterSLA=0;
+
+        if(uiUIModeTypeGet() == UI_STATE_TYPE_MODE)
+        {
+            for(uiCounterSLA=0;uiCounterSLA<SETTINGS_SLA_AMOUNT;uiCounterSLA++)
+            {
+                if(uiUISLAActive[uiCounterSLA])
+                {
+                    tsSettings[uiCounterSLA].uiModeParameter[0][uiUIParameter]=uiUIParameterValue;
+                }
+            }
+        }
+        else if(uiUIModeTypeGet() == UI_STATE_TYPE_MODIFIER)
+        {
+            for(uiCounterSLA=0;uiCounterSLA<SETTINGS_SLA_AMOUNT;uiCounterSLA++)
+            {
+                if(uiUISLAActive[uiCounterSLA])
+                {
+                    tsSettings[uiCounterSLA].uiModeParameter[UI_MODIFIER_INDEX][uiUIParameter]=uiUIParameterValue;
+                }
+            }
+        }
+
+
+}
+
+uint16_t uiUISettingValueGet(void)
+{
+    if(uiUISetting < 8)
+    {
+        return tsSettings[uiUISetting].uiSLALength;
     }
-    else if(uiUIModeTypeGet() == UI_STATE_TYPE_MODIFIER)
+    else if(uiUISetting == 8)
     {
-        while(uiCounterSLA<SETTINGS_SLA_AMOUNT)
-        {
-            if(uiUISLAActive[uiCounterSLA])
-            {
-                return tsSettings[uiCounterSLA].uiModeParameter[UI_MODIFIER_INDEX][uiUIParameter];
-            }
-            uiCounterSLA++;
-        }
+        return tsSystemTime.uiHour;
+    }
+    else if(uiUISetting == 9)
+    {
+        return tsSystemTime.uiMinute;
+    }
+    else if(uiUISetting == 10)
+    {
+        return tsSystemTime.uiSecond;
+
+    }
+    else if(uiUISetting == 11)
+    {
+        return tsSystemTime.ui100MilliSecond;
     }
 
     return 0;
 }
 
-void uiUIParameterValueSet(void)
+void vUISettingValueSet(void)
 {
-    uint8_t uiCounterSLA=0;
-
-    if(uiUIModeTypeGet() == UI_STATE_TYPE_MODE)
+    if(uiUISetting < 8)
     {
-        for(uiCounterSLA=0;uiCounterSLA<SETTINGS_SLA_AMOUNT;uiCounterSLA++)
-        {
-            if(uiUISLAActive[uiCounterSLA])
-            {
-                tsSettings[uiCounterSLA].uiModeParameter[0][uiUIParameter]=uiUIParameterValue;
-            }
-        }
+        tsSettings[uiUISetting].uiSLALength=uiUISettingValue;
     }
-    else if(uiUIModeTypeGet() == UI_STATE_TYPE_MODIFIER)
+    else if(uiUISetting == 8)
     {
-        for(uiCounterSLA=0;uiCounterSLA<SETTINGS_SLA_AMOUNT;uiCounterSLA++)
-        {
-            if(uiUISLAActive[uiCounterSLA])
-            {
-                tsSettings[uiCounterSLA].uiModeParameter[UI_MODIFIER_INDEX][uiUIParameter]=uiUIParameterValue;
-            }
-        }
+        tsSystemTime.uiHour=uiUISettingValue;
+    }
+    else if(uiUISetting == 9)
+    {
+        tsSystemTime.uiMinute=uiUISettingValue;
+    }
+    else if(uiUISetting == 10)
+    {
+        tsSystemTime.uiSecond=uiUISettingValue;
+
+    }
+    else if(uiUISetting == 11)
+    {
+        tsSystemTime.ui100MilliSecond=uiUISettingValue;
     }
 }

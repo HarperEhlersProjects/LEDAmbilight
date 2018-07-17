@@ -36,7 +36,7 @@
 /*
  * QEI counter maximum position
  */
-#define QEI_COUNTER_MAX (512+QEI_COUNTER_OFFSET)
+#define QEI_COUNTER_MAX (1000+QEI_COUNTER_OFFSET)
 
 /*
  * QEI counter initial position
